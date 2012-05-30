@@ -1,4 +1,5 @@
 (ns autodoc.autodoc
+  (:require [clojure.string :as string])
   (:use 
    [clojure.pprint :only (cl-format)]
    [clojure.java.io :only [file make-parents]]
@@ -60,6 +61,10 @@
          (and (== (count branches) 1) 
               (nil? (ffirst branches))))))
 
+;; str format: "[ns1 ns2]"
+(defn parse-namespaces-to-documents [str]
+  (-> (string/replace str #"[\[\]]" "") (string/split #"\s+")))
+
 (defn autodoc
   ([myparams] (autodoc myparams nil))
   ([myparams cmd & cmd-args]
@@ -77,13 +82,15 @@
          (copy-statics)
          (gen-branch-docs))
        (do 
-         (when (nil? (params :namespaces-to-document))
+         (if (nil? (params :namespaces-to-document))
           (merge-params {:namespaces-to-document
                          (map
-                          name
-                          (find-namespaces-in-dir
-                           (file (params :root)
-                                 (params :source-path))))}))
+                           name
+                           (find-namespaces-in-dir
+                             (file (params :root)
+                                   (params :source-path))))})
+           (merge-params {:namespaces-to-document (parse-namespaces-to-documents (params :namespaces-to-document))}))
+         (println params)
          (if-let [cmd-sym ((set commands) (symbol (or cmd 'build-html)))]
            (apply (sym-to-var cmd-sym) cmd-args)
            (do

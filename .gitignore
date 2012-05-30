@@ -1,2 +1,17 @@
-#ignore generated autodoc files
-autodoc/**
+filetag.bat
+filenametags
+pom.xml
+*wb50.mwb
+*jar
+*war
+*swp
+*swo
+*class
+*docx#
+*~
+.lein-deps-sum
+/server/autodoc
+/server/.lein-deps-sum
+/server/classes/
+/server/lib/
+/server/log
